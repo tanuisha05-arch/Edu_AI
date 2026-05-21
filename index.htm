@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduAI – AI-Powered Learning Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#3b82f6;--blue-light:#eff6ff;--blue-mid:#bfdbfe;
+  --green:#10b981;--green-light:#ecfdf5;
+  --orange:#f59e0b;--orange-light:#fffbeb;
+  --red:#ef4444;--red-light:#fef2f2;
+  --gray-light:#f9fafb;--gray-border:#e5e7eb;
+  --text:#1f2937;--text2:#4b5563;--text3:#9ca3af;
+  --white:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
+  --radius:10px;--radius-lg:14px;
+  --font:'Nunito',sans-serif;--mono:'Fira Code',monospace;
+}
+body{font-family:var(--font);background:#f3f4f6;color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--gray-border);border-radius:3px}
+.navbar{background:var(--white);border-bottom:1px solid var(--gray-border);padding:0 1.5rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.nav-logo{font-size:18px;font-weight:800;color:var(--blue);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--text);font-weight:600}
+.nav-links{display:flex;gap:3px}
+.nav-link{padding:7px 13px;border-radius:var(--radius);font-size:13.5px;font-weight:600;cursor:pointer;color:var(--text2);transition:all 0.12s;border:none;background:none;font-family:var(--font)}
+.nav-link:hover{background:var(--gray-light);color:var(--text)}
+.nav-link.active{background:var(--blue-light);color:var(--blue)}
+.xp-badge{background:var(--orange-light);color:var(--orange);border:1px solid #fde68a;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700}
+.page{display:none;max-width:860px;margin:0 auto;padding:1.5rem}
+.page.active{display:block}
+.card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow)}
+.card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:1rem}
+.section-head{margin-bottom:1.25rem}
+.section-head h2{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.section-head p{font-size:14px;color:var(--text2)}
+.btn{padding:10px 20px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#2563eb;transform:translateY(-1px)}
+.btn-outline{background:var(--white);color:var(--blue);border:2px solid var(--blue)}.btn-outline:hover{background:var(--blue-light)}
+/* HOME */
+.hero{background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%);border:1px solid var(--blue-mid);border-radius:var(--radius-lg);padding:2rem 1.5rem;text-align:center;margin-bottom:1.5rem}
+.hero h1{font-size:26px;font-weight:800;color:var(--text);margin-bottom:8px}
+.hero p{font-size:15px;color:var(--text2);max-width:520px;margin:0 auto 1.5rem;line-height:1.65}
+.hero-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.feature-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;cursor:pointer;transition:all 0.18s;box-shadow:var(--shadow)}
+.feature-card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.feature-icon{font-size:32px;margin-bottom:10px;display:block}
+.feature-card h3{font-size:14px;font-weight:700;margin-bottom:5px}
+.feature-card p{font-size:12px;color:var(--text2);line-height:1.5}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat-box{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-size:26px;font-weight:800;margin-bottom:2px}
+.stat-lbl{font-size:12px;color:var(--text2)}
+/* CHAT */
+.chat-box{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);box-shadow:var(--shadow);display:flex;flex-direction:column;height:520px}
+.chat-header{padding:1rem 1.25rem;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;justify-content:space-between}
+.chat-header-left{display:flex;align-items:center;gap:10px}
+.ai-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.chat-name{font-size:14px;font-weight:700}
+.chat-status{font-size:12px;color:var(--green)}
+.ai-badge{font-size:11px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:20px;padding:3px 10px;font-weight:600}
+.messages{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:10px;align-items:flex-end;animation:msgIn 0.2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.msg-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.msg-av.ai{background:var(--blue-light);border:1px solid var(--blue-mid)}
+.msg-av.user{background:#e0e7ff;border:1px solid #c7d2fe}
+.bubble{max-width:76%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.65}
+.bubble.ai{background:var(--gray-light);border:1px solid var(--gray-border);border-bottom-left-radius:4px}
+.bubble.user{background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.bubble code{font-family:var(--mono);font-size:12px;background:rgba(0,0,0,0.07);padding:1px 5px;border-radius:4px}
+.bubble pre{font-family:var(--mono);font-size:12px;background:rgba(0,0,0,0.06);padding:10px;border-radius:8px;margin:8px 0;overflow-x:auto;line-height:1.5;white-space:pre-wrap}
+.bubble ul,.bubble ol{padding-left:1.2rem;margin-top:5px}
+.bubble li{margin-bottom:3px}
+.bubble b,.bubble strong{font-weight:700}
+.typing-b{background:var(--gray-light);border:1px solid var(--gray-border);border-radius:14px;border-bottom-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center}
+.td{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:td 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.suggestions{padding:0.75rem 1.25rem;border-top:1px solid var(--gray-border);display:flex;flex-wrap:wrap;gap:6px}
+.sug{font-size:12px;padding:5px 11px;border-radius:20px;border:1px solid var(--blue-mid);background:var(--blue-light);color:var(--blue);cursor:pointer;font-family:var(--font);font-weight:600;transition:all 0.12s}
+.sug:hover{background:var(--blue);color:#fff}
+.chat-input-area{padding:0.875rem 1.25rem;border-top:1px solid var(--gray-border);display:flex;gap:8px}
+.chat-input{flex:1;padding:9px 14px;border:1.5px solid var(--gray-border);border-radius:var(--radius);font-family:var(--font);font-size:14px;outline:none;transition:border-color 0.15s;color:var(--text)}
+.chat-input:focus{border-color:var(--blue)}
+.chat-input::placeholder{color:var(--text3)}
+.send-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;font-family:var(--font);transition:all 0.15s}
+.send-btn:hover{background:#2563eb}
+.send-btn:disabled{opacity:0.45;cursor:not-allowed}
+/* QUIZ */
+.topic-select-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.topic-btn{background:var(--white);border:2px solid var(--gray-border);border-radius:var(--radius-lg);padding:1rem;text-align:center;cursor:pointer;transition:all 0.15s;font-family:var(--font)}
+.topic-btn:hover{border-color:var(--blue);background:var(--blue-light)}
+.topic-btn.sel{border-color:var(--blue);background:var(--blue-light)}
+.topic-btn .t-icon{font-size:26px;display:block;margin-bottom:6px}
+.topic-btn .t-name{font-size:13px;font-weight:700;color:var(--text)}
+.diff-row{display:flex;gap:8px;margin-bottom:1.25rem}
+.diff-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--gray-border);cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font);background:var(--white);color:var(--text2);transition:all 0.12s}
+.diff-btn:hover{border-color:var(--blue)}
+.diff-btn.sel{border-color:var(--blue);background:var(--blue);color:#fff}
+.start-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all 0.15s}
+.start-btn:hover:not(:disabled){background:#2563eb;transform:translateY(-1px)}
+.start-btn:disabled{opacity:0.4;cursor:not-allowed}
+.q-prog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.q-prog-txt{font-size:13px;color:var(--text2);font-weight:600}
+.q-prog-bar{height:6px;background:var(--gray-border);border-radius:3px;margin-bottom:1.25rem;overflow:hidden}
+.q-prog-fill{height:100%;border-radius:3px;background:var(--blue);transition:width 0.4s}
+.q-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow)}
+.q-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:12px}
+.badge-easy{background:var(--green-light);color:var(--green)}
+.badge-medium{background:var(--orange-light);color:var(--orange)}
+.badge-hard{background:var(--red-light);color:var(--red)}
+.q-text{font-size:16px;font-weight:600;line-height:1.6;margin-bottom:1.25rem}
+.q-code{font-family:var(--mono);font-size:13px;background:#f8fafc;border:1px solid var(--gray-border);padding:12px;border-radius:8px;margin-bottom:1.25rem;overflow-x:auto;line-height:1.6;white-space:pre}
+.options{display:flex;flex-direction:column;gap:9px}
+.opt-btn{padding:11px 16px;border:1.5px solid var(--gray-border);border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:500;font-family:var(--font);background:var(--white);color:var(--text);text-align:left;display:flex;align-items:center;gap:12px;transition:all 0.15s}
+.opt-btn:hover:not(.locked){border-color:var(--blue);background:var(--blue-light);color:var(--blue)}
+.opt-letter{width:26px;height:26px;border-radius:8px;background:var(--gray-light);border:1px solid var(--gray-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--mono);transition:all 0.15s}
+.opt-btn:hover:not(.locked) .opt-letter{background:var(--blue);border-color:var(--blue);color:#fff}
+.opt-btn.correct{border-color:var(--green);background:var(--green-light);color:#065f46}
+.opt-btn.correct .opt-letter{background:var(--green);border-color:var(--green);color:#fff}
+.opt-btn.wrong{border-color:var(--red);background:var(--red-light);color:#7f1d1d}
+.opt-btn.wrong .opt-letter{background:var(--red);border-color:var(--red);color:#fff}
+.opt-btn.locked{cursor:default}
+.exp-msg{margin-top:12px;padding:11px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius);font-size:13px;color:#78350f;line-height:1.6;display:none}
+.exp-msg.show{display:block}
+.q-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1rem}
+.score-mini{font-size:13px;color:var(--text2);font-weight:600}
+.next-q-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:9px 20px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;display:none;transition:all 0.15s}
+.next-q-btn:hover{background:#2563eb}
+.result-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:2rem;text-align:center;box-shadow:var(--shadow)}
+.score-ring{width:100px;height:100px;border-radius:50%;margin:0 auto 1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--blue)}
+.score-pct{font-size:26px;font-weight:800;color:var(--blue)}
+.score-frac{font-size:12px;color:var(--text3);font-weight:600}
+.result-title{font-size:20px;font-weight:800;margin-bottom:6px}
+.result-sub{font-size:14px;color:var(--text2);margin-bottom:1.5rem}
+.result-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.bd-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin:1.5rem 0 0.75rem;text-align:left}
+.bd-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-border);text-align:left;font-size:13px}
+.bd-item:last-child{border-bottom:none}
+.bd-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px}
+.scores-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem}
+.s-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:1.1rem;text-align:center;box-shadow:var(--shadow)}
+.s-val{font-size:28px;font-weight:800;margin-bottom:3px}
+.s-lbl{font-size:12px;color:var(--text2)}
+.history-list{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.hl-head{display:grid;grid-template-columns:1fr 90px 70px 70px;padding:10px 15px;background:var(--gray-light);font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+.hl-row{display:grid;grid-template-columns:1fr 90px 70px 70px;padding:11px 15px;border-top:1px solid var(--gray-border);font-size:13px;align-items:center}
+.hl-row:hover{background:#fafafa}
+.hl-topic{font-weight:600}
+.hl-score-val{font-weight:700;font-family:var(--mono)}
+.badge-pass{background:var(--green-light);color:var(--green);font-size:11px;padding:2px 9px;border-radius:10px;font-weight:700}
+.badge-fail{background:var(--red-light);color:var(--red);font-size:11px;padding:2px 9px;border-radius:10px;font-weight:700}
+.empty-msg{text-align:center;padding:2.5rem 1rem;color:var(--text2);font-size:14px}
+.about-card{margin-bottom:1.25rem}
+.about-card h3{font-size:17px;font-weight:800;color:var(--text);margin-bottom:0.75rem}
+.about-card p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:0.6rem}
+.about-card ul{padding-left:1.3rem;font-size:14px;color:var(--text2);line-height:1.9}
+.about-card li{margin-bottom:2px}
+.about-card li b{color:var(--text);font-weight:700}
+.rule-list{display:flex;flex-direction:column;gap:0}
+.rule-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-border);font-size:14px;color:var(--text2);line-height:1.5}
+.rule-item:last-child{border-bottom:none}
+.rule-num{width:24px;height:24px;border-radius:50%;background:var(--blue-light);color:var(--blue);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tech-item{background:var(--gray-light);border:1px solid var(--gray-border);border-radius:var(--radius);padding:0.875rem 1rem;font-size:13px}
+.tech-item b{display:block;font-weight:700;color:var(--text);margin-bottom:3px}
+.tech-item span{color:var(--text2)}
+.team-note{background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;font-size:14px;color:var(--text2);line-height:1.7;margin-top:1.25rem}
+.team-note b{color:var(--blue);font-weight:700}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">🎓 <span>EduAI</span></div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home',this)">🏠 Home</button>
+    <button class="nav-link" onclick="showPage('chat',this)">🤖 AI Tutor</button>
+    <button class="nav-link" onclick="showPage('quiz',this)">📝 Quiz</button>
+    <button class="nav-link" onclick="showPage('scores',this)">📊 Scores</button>
+    <button class="nav-link" onclick="showPage('about',this)">ℹ️ About</button>
+  </div>
+  <div class="xp-badge">⚡ <span id="xp-count">0</span> XP</div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>AI-Powered Learning Assistant 🚀</h1>
+    <p>Ask questions, take quizzes, and improve your understanding using Artificial Intelligence and Natural Language Processing.</p>
+    <div class="hero-btns">
+      <button class="btn btn-blue" onclick="showPage('chat',null)">Chat with AI Tutor 🤖</button>
+      <button class="btn btn-outline" onclick="showPage('quiz',null)">Take a Quiz 📝</button>
+    </div>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card" onclick="showPage('chat',null)"><span class="feature-icon">🤖</span><h3>AI Tutor</h3><p>Ask any question and get instant answers powered by Google Gemini AI.</p></div>
+    <div class="feature-card" onclick="showPage('quiz',null)"><span class="feature-icon">📝</span><h3>Quiz Generator</h3><p>Test yourself with auto-generated quizzes across 6 CS topics.</p></div>
+    <div class="feature-card" onclick="showPage('scores',null)"><span class="feature-icon">📊</span><h3>Progress Tracker</h3><p>Track your scores and see how you improve over time.</p></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" style="color:var(--blue)" id="home-quizzes">0</div><div class="stat-lbl">Quizzes Taken</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:var(--green)" id="home-avg">—</div><div class="stat-lbl">Average Score</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:var(--orange)" id="home-xp">0</div><div class="stat-lbl">XP Earned</div></div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="page" id="page-chat">
+  <div class="section-head">
+    <h2>🤖 AI Tutor</h2>
+    <p>Powered by Google Gemini — ask me anything about CS, AI, Python, or any study topic!</p>
+  </div>
+  <div class="chat-box">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="ai-dot"></div>
+        <div>
+          <div class="chat-name">EduAI Assistant</div>
+          <div class="chat-status">Powered by Google Gemini AI</div>
+        </div>
+      </div>
+      <span class="ai-badge">🟢 Real AI Connected</span>
+    </div>
+    <div class="messages" id="messages">
+      <div class="msg">
+        <div class="msg-av ai">🤖</div>
+        <div class="bubble ai">
+          Hello! 👋 I'm your AI learning assistant powered by <b>Google Gemini</b>.<br><br>
+          I can answer <b>any question</b> about Computer Science, AI, Python, Algorithms, Web Dev, Databases and more!<br><br>
+          What would you like to learn today? 😊
+        </div>
+      </div>
+    </div>
+    <div class="suggestions" id="sug-row">
+      <button class="sug" onclick="sendSug('What is recursion in programming?')">What is recursion?</button>
+      <button class="sug" onclick="sendSug('Explain Big O notation with examples')">Big O notation</button>
+      <button class="sug" onclick="sendSug('What is machine learning?')">What is ML?</button>
+      <button class="sug" onclick="sendSug('How does NLP work?')">How NLP works</button>
+      <button class="sug" onclick="sendSug('Difference between stack and queue')">Stack vs Queue</button>
+      <button class="sug" onclick="sendSug('What is OOP and its 4 pillars?')">OOP pillars</button>
+    </div>
+    <div class="chat-input-area">
+      <input class="chat-input" id="chat-input" placeholder="Type your question here..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="send-btn" id="send-btn" onclick="sendChat()">Send →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="page" id="page-quiz">
+  <div id="quiz-setup">
+    <div class="section-head"><h2>📝 Take a Quiz</h2><p>Choose a topic and difficulty, then test your knowledge!</p></div>
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-title">📚 Choose a Topic</div>
+      <div class="topic-select-row">
+        <div class="topic-btn" onclick="pickTopic(this,'Computer Science')"><span class="t-icon">💻</span><div class="t-name">Computer Science</div></div>
+        <div class="topic-btn" onclick="pickTopic(this,'Artificial Intelligence')"><span class="t-icon">🧠</span><div class="t-name">Artificial Intelligence</div></div>
+        <div class="topic-btn" onclick="pickTopic(this,'Python Programming')"><span class="t-icon">🐍</span><div class="t-name">Python Programming</div></div>
+        <div class="topic-btn" onclick="pickTopic(this,'Data Structures')"><span class="t-icon">🗂️</span><div class="t-name">Data Structures</div></div>
+        <div class="topic-btn" onclick="pickTopic(this,'Web Development')"><span class="t-icon">🌐</span><div class="t-name">Web Development</div></div>
+        <div class="topic-btn" onclick="pickTopic(this,'Databases')"><span class="t-icon">🗄️</span><div class="t-name">Databases</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-title">🎯 Choose Difficulty</div>
+      <div class="diff-row">
+        <button class="diff-btn sel" onclick="pickDiff(this,'easy')">Easy</button>
+        <button class="diff-btn" onclick="pickDiff(this,'medium')">Medium</button>
+        <button class="diff-btn" onclick="pickDiff(this,'hard')">Hard</button>
+      </div>
+    </div>
+    <button class="start-btn" id="start-btn" disabled onclick="startQuiz()">Select a topic to start →</button>
+  </div>
+  <div id="quiz-active" style="display:none"></div>
+</div>
+
+<!-- SCORES -->
+<div class="page" id="page-scores">
+  <div class="section-head"><h2>📊 My Progress</h2><p>Track how you are doing over time in each topic.</p></div>
+  <div class="scores-grid">
+    <div class="s-card"><div class="s-val" style="color:var(--blue)" id="sc-total">0</div><div class="s-lbl">Quizzes Taken</div></div>
+    <div class="s-card"><div class="s-val" style="color:var(--green)" id="sc-avg">—</div><div class="s-lbl">Average Score</div></div>
+    <div class="s-card"><div class="s-val" style="color:var(--orange)" id="sc-best">—</div><div class="s-lbl">Best Score</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Quiz History</div>
+    <div class="history-list">
+      <div class="hl-head"><span>Topic</span><span>Difficulty</span><span>Score</span><span>Result</span></div>
+      <div id="history-rows"><div class="empty-msg">No quizzes yet! <button class="btn btn-blue" style="padding:6px 14px;font-size:13px;margin-left:8px" onclick="showPage('quiz',null)">Take a Quiz</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="section-head"><h2>ℹ️ About This Project</h2><p>AI in Education — Web Application Project</p></div>
+  <div class="card about-card">
+    <h3>📌 Context</h3>
+    <p>With the rapid growth of digital learning platforms, students increasingly rely on online tools to understand academic concepts. However, many traditional e-learning systems lack real-time interaction and personalized feedback.</p>
+    <p>By integrating <b>Artificial Intelligence (AI)</b> and <b>Natural Language Processing (NLP)</b> via the <b>Google Gemini API</b>, this web application provides instant responses, generates quizzes, and supports students in understanding educational topics more effectively.</p>
+  </div>
+  <div class="card about-card">
+    <h3>🎯 Objective</h3>
+    <ul>
+      <li><b>Provide instant answers</b> to student questions using Google Gemini AI</li>
+      <li><b>Generate interactive quizzes</b> across multiple CS topics</li>
+      <li><b>Track student performance</b> and quiz history</li>
+      <li><b>Improve engagement</b> through a friendly, easy-to-use interface</li>
+      <li><b>Support personalized learning</b> through topic-based quizzes</li>
+    </ul>
+  </div>
+  <div class="card about-card">
+    <h3>⚙️ How the System Works</h3>
+    <div class="rule-list">
+      <div class="rule-item"><div class="rule-num">1</div><div>Student types a question through the web interface.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div>Input is sent to <b>Google Gemini API</b> which processes it using NLP.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div>The AI identifies the user's intent and relevant topic area.</div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div>Gemini generates a clear, accurate, educational response.</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div>Quiz questions are generated from a curated knowledge base per topic.</div></div>
+      <div class="rule-item"><div class="rule-num">6</div><div>The system evaluates answers and calculates the student's score instantly.</div></div>
+      <div class="rule-item"><div class="rule-num">7</div><div>Feedback and explanations are shown after each question.</div></div>
+      <div class="rule-item"><div class="rule-num">8</div><div>All quiz results are saved and displayed in the Progress Tracker.</div></div>
+    </div>
+  </div>
+  <div class="card about-card">
+    <h3>🛠️ Technologies Used</h3>
+    <div class="tech-grid">
+      <div class="tech-item"><b>Frontend</b><span>HTML5, CSS3, JavaScript (Vanilla)</span></div>
+      <div class="tech-item"><b>AI / NLP Engine</b><span>Google Gemini API (gemini-2.0-flash)</span></div>
+      <div class="tech-item"><b>Quiz System</b><span>Knowledge base — 6 topics, 3 difficulty levels</span></div>
+      <div class="tech-item"><b>Progress Tracking</b><span>JavaScript session-based storage</span></div>
+    </div>
+  </div>
+  <div class="team-note">
+    <b>Project by:</b> 3rd Year Computer Science Student &nbsp;·&nbsp; Subject: AI in Education &nbsp;·&nbsp; 2024–2025<br>
+    This project demonstrates how AI and NLP (Google Gemini) can be integrated into a web app to help students learn effectively.
+  </div>
+</div>
+
+<script>
+// =====================================================
+// ✅ FIX 1: GEMINI API KEY AND URL — properly defined
+// =====================================================
+const GEMINI_API_KEY = "AIzaSyC3wjB_YFhFTkJamIwZFOtgp8RRwJz90ZQ";
+const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+// conversation history for multi-turn chat
+let chatHistory = [];
+
+// =====================================================
+//  QUIZ DATA
+// =====================================================
+const QUESTIONS = {
+  'Computer Science':[
+    {q:'What does CPU stand for?',opts:['Central Processing Unit','Computer Processing Utility','Core Power Unit','Central Program Utility'],ans:0,diff:'easy',exp:'CPU = Central Processing Unit — the main chip that executes instructions in a computer.'},
+    {q:'Which data structure uses LIFO (Last In, First Out) order?',opts:['Queue','Stack','Array','Linked List'],ans:1,diff:'easy',exp:'A Stack uses LIFO — the last element pushed is the first one popped. Like a stack of plates.'},
+    {q:'What is the time complexity of binary search?',opts:['O(n)','O(n²)','O(log n)','O(1)'],ans:2,diff:'medium',exp:'Binary search is O(log n) — it halves the search space at each step.'},
+    {q:'What does RAM stand for?',opts:['Read Access Memory','Random Access Memory','Rapid Array Memory','Run Access Module'],ans:1,diff:'easy',exp:'RAM = Random Access Memory — temporary fast storage used while the computer is running.'},
+    {q:'What is recursion?',opts:['A loop that counts down','A function that calls itself','A type of variable','A sorting method'],ans:1,diff:'medium',exp:'Recursion is when a function calls itself to solve a smaller version of the same problem.'},
+    {q:'Which sorting algorithm has O(n²) worst-case?',opts:['Merge Sort','Quick Sort','Bubble Sort','Heap Sort'],ans:2,diff:'hard',exp:'Bubble Sort has O(n²) because it uses nested loops to compare every pair of elements.'},
+    {q:'What is an operating system?',opts:['A web browser','Software that manages hardware and provides services','A type of RAM','An internet protocol'],ans:1,diff:'easy',exp:'An OS (like Windows or Linux) manages hardware resources and provides services for programs.'},
+    {q:'Which is NOT a programming language?',opts:['Python','Java','HTML','C++'],ans:2,diff:'easy',exp:'HTML is a markup language for web pages, not a programming language.'}
+  ],
+  'Artificial Intelligence':[
+    {q:'What does AI stand for?',opts:['Automated Input','Artificial Intelligence','Advanced Integration','Automated Intelligence'],ans:1,diff:'easy',exp:'AI = Artificial Intelligence — the simulation of human intelligence in machines.'},
+    {q:'What does NLP stand for?',opts:['Neural Learning Process','Natural Language Processing','Network Layer Protocol','Non-Linear Programming'],ans:1,diff:'easy',exp:'NLP = Natural Language Processing — helps computers understand and generate human language.'},
+    {q:'What is supervised learning?',opts:['Learning without labels','Learning with labeled training data','Learning by trial and error','Learning from videos'],ans:1,diff:'medium',exp:'Supervised learning uses labeled data — the algorithm learns from input-output pairs.'},
+    {q:'What is a neural network inspired by?',opts:['The solar system','The human brain','Computer circuits','Database tables'],ans:1,diff:'medium',exp:'Neural networks are inspired by biological neurons in the human brain.'},
+    {q:'What is overfitting?',opts:['Model works well everywhere','Model is too simple','Model memorizes training data, fails on new data','Model never learns'],ans:2,diff:'hard',exp:'Overfitting = model memorizes training data including noise → fails on new unseen data.'},
+    {q:'Training a model means?',opts:['Writing code manually','Feeding examples so model learns patterns','Running faster','Connecting to internet'],ans:1,diff:'easy',exp:'Training = feeding many examples so the model learns patterns to make predictions.'},
+    {q:'Which is used for classification in ML?',opts:['Bubble Sort','Decision Tree','Binary Search','DFS'],ans:1,diff:'medium',exp:'Decision Trees classify data by splitting on feature values.'},
+    {q:'Main goal of AI?',opts:['Replace all humans','Perform tasks requiring human intelligence','Speed up computers only','Build robots only'],ans:1,diff:'easy',exp:'AI goal = build machines that can perform tasks that normally require human intelligence.'}
+  ],
+  'Python Programming':[
+    {code:"x = [1, 2, 3, 4, 5]\nprint(x[1:3])",q:'What is the output?',opts:['[1, 2]','[2, 3]','[2, 3, 4]','[1, 2, 3]'],ans:1,diff:'easy',exp:'x[1:3] returns indices 1 and 2 (stop is exclusive) → [2, 3].'},
+    {q:'Keyword to define a function?',opts:['function','define','def','func'],ans:2,diff:'easy',exp:'"def" defines a function. Example: def my_function():'},
+    {code:"d = {'name': 'Ali', 'age': 20}\nprint(d.get('grade', 'N/A'))",q:'What does this print?',opts:['None','KeyError','grade','N/A'],ans:3,diff:'medium',exp:'dict.get(key, default) returns the default when key is not found → N/A.'},
+    {q:'Which creates an empty list?',opts:['list={}','list=()','list=[]','list=""'],ans:2,diff:'easy',exp:'[] = empty list. {} = dict, () = tuple.'},
+    {code:"result = [x*2 for x in range(5) if x > 2]\nprint(result)",q:'What is printed?',opts:['[2,4,6,8,10]','[6,8,10]','[3,4,5]','[1,2,3,4,5]'],ans:1,diff:'medium',exp:'Values > 2 are 3,4,5. Multiplied by 2 → [6, 8, 10].'},
+    {q:'What does len() return?',opts:['Loops through list','Number of items in object','Sorts list','Converts to string'],ans:1,diff:'easy',exp:'len() returns count of items. len([1,2,3]) = 3.'},
+    {code:"def greet(name='World'):\n    return f'Hello, {name}!'\nprint(greet('Ali'))",q:'What is the output?',opts:['Hello, World!','Hello, Ali!','Hello, name!','Error'],ans:1,diff:'easy',exp:'Called with "Ali" → f-string gives: Hello, Ali!'},
+    {q:'Type of 3.14 in Python?',opts:["<class 'int'>","<class 'float'>","<class 'str'>","<class 'double'>"],ans:1,diff:'medium',exp:'3.14 is a decimal so its type is float.'}
+  ],
+  'Data Structures':[
+    {q:'Which follows FIFO (First In First Out)?',opts:['Stack','Queue','Tree','Graph'],ans:1,diff:'easy',exp:'Queue = FIFO — first added is first removed. Like a line of people.'},
+    {q:'Time complexity of array index access?',opts:['O(n)','O(log n)','O(1)','O(n²)'],ans:2,diff:'easy',exp:'O(1) — arrays use direct memory addressing so index access is instant.'},
+    {q:'Linked list node contains?',opts:['Only data','Only pointer','Data + pointer to next node','Two pointers only'],ans:2,diff:'easy',exp:'Each node = data value + pointer to the next node.'},
+    {q:'Best structure for "undo" feature?',opts:['Queue','Stack','Array','Hash Map'],ans:1,diff:'medium',exp:'Stack — last action pushed is first popped (LIFO). Perfect for undo.'},
+    {q:'What is a hash collision?',opts:['Table full','Two keys get same hash value','Node deleted','Tree unbalanced'],ans:1,diff:'medium',exp:'Collision = two different keys hash to same index. Solved by chaining.'},
+    {q:'Worst-case search in balanced BST?',opts:['O(1)','O(n)','O(log n)','O(n log n)'],ans:2,diff:'hard',exp:'O(log n) — balanced BST height = log n.'},
+    {q:'BST traversal for sorted order?',opts:['Preorder','Postorder','Inorder','Level order'],ans:2,diff:'hard',exp:'Inorder (Left→Root→Right) gives ascending sorted order.'},
+    {q:'Height of complete binary tree?',opts:['n','n/2','log₂(n)','n²'],ans:2,diff:'medium',exp:'Height ≈ log₂(n) because each level doubles nodes.'}
+  ],
+  'Web Development':[
+    {q:'HTML stands for?',opts:['Hyper Text Markup Language','High Tech Modern Language','Hyper Transfer Markup Link','Home Tool Markup Language'],ans:0,diff:'easy',exp:'HTML = HyperText Markup Language — creates web page structure.'},
+    {q:'CSS stands for?',opts:['Computer Style Sheets','Cascading Style Sheets','Creative Style Syntax','Colorful Style Sheets'],ans:1,diff:'easy',exp:'CSS = Cascading Style Sheets — styles HTML elements.'},
+    {q:'HTTP 404 means?',opts:['OK','Moved','Forbidden','Not Found'],ans:3,diff:'medium',exp:'404 = Not Found — server cannot find the requested resource.'},
+    {code:"console.log(5 == '5');\nconsole.log(5 === '5');",q:'JavaScript output?',opts:['true,true','false,false','true,false','false,true'],ans:2,diff:'medium',exp:'== checks value (true). === checks value+type (false — number vs string).'},
+    {q:'DOM stands for?',opts:['Document Object Model','Data Object Method','Digital Output Module','Document Output Map'],ans:0,diff:'medium',exp:'DOM = Document Object Model — HTML tree JavaScript can manipulate.'},
+    {q:'Responsive design means?',opts:['Fast server','Layout adapts to all screen sizes','Animations','Clickable buttons'],ans:1,diff:'easy',exp:'Responsive = layout adjusts for phones, tablets, desktops.'},
+    {q:'HTML tag for hyperlink?',opts:['<link>','<href>','<a>','<url>'],ans:2,diff:'easy',exp:'<a> (anchor) creates hyperlinks. <a href="url">Click</a>'},
+    {q:'Correct CSS syntax?',opts:['color:red;','color=red;','{color:red}','font-color:red;'],ans:0,diff:'easy',exp:'CSS: property: value; — example: color: red;'}
+  ],
+  'Databases':[
+    {q:'SQL stands for?',opts:['Structured Query Language','Simple Query Logic','System Query Language','Structured Question List'],ans:0,diff:'easy',exp:'SQL = Structured Query Language — read, write, update, delete data.'},
+    {q:'Command to retrieve data?',opts:['INSERT','UPDATE','SELECT','DELETE'],ans:2,diff:'easy',exp:'SELECT retrieves data. SELECT * FROM users;'},
+    {q:'What is PRIMARY KEY?',opts:['First column','Unique row identifier','Foreign reference','Indexed column'],ans:1,diff:'easy',exp:'PRIMARY KEY = unique identifier per row, cannot be null.'},
+    {q:'FOREIGN KEY does what?',opts:['Creates table','Links to another table primary key','Deletes duplicates','Creates index'],ans:1,diff:'medium',exp:'FOREIGN KEY creates a relationship between two tables.'},
+    {code:"SELECT name, age FROM students\nWHERE age > 18\nORDER BY age DESC;",q:'What does this query do?',opts:['Deletes students','Updates ages','Gets name & age over 18, oldest first','Counts students'],ans:2,diff:'medium',exp:'Filters adults (age>18), sorts by age descending = oldest first.'},
+    {q:'Normalization means?',opts:['Make DB larger','Reduce redundancy, improve integrity','Encrypt data','Delete old records'],ans:1,diff:'medium',exp:'Normalization organizes tables to minimize data duplication.'},
+    {q:'ACID stands for?',opts:['Array,Columns,Index,Data','Atomicity,Consistency,Isolation,Durability','Access,Create,Insert,Delete','Automatic,Correct,Integrated,Dynamic'],ans:1,diff:'hard',exp:'ACID = Atomicity, Consistency, Isolation, Durability.'},
+    {q:'DELETE vs TRUNCATE?',opts:['No difference','DELETE specific rows (reversible); TRUNCATE all rows fast','TRUNCATE slower','DELETE removes table'],ans:1,diff:'hard',exp:'DELETE = specific rows, reversible. TRUNCATE = all rows, faster.'}
+  ]
+};
+
+// =====================================================
+//  APP STATE
+// =====================================================
+let state = { xp:0, history:[] };
+let qz = { topic:null, difficulty:'easy', questions:[], idx:0, score:0, answered:false, breakdown:[] };
+
+// =====================================================
+//  NAVIGATION
+// =====================================================
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    const map = { home:'home', chat:'tutor', quiz:'quiz', scores:'score', about:'about' };
+    const kw = map[id] || id;
+    document.querySelectorAll('.nav-link').forEach(n => {
+      if (n.textContent.toLowerCase().includes(kw)) n.classList.add('active');
+    });
+  }
+  if (id === 'scores') renderScores();
+  if (id === 'home') updateHome();
+}
+
+// =====================================================
+// ✅ FIX 2: COMPLETE sendChat function — calls Gemini properly
+// =====================================================
+async function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+  appendMsg(val, 'user');
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('sug-row').style.display = 'none';
+  const tid = showTyping();
+
+  try {
+    // Build conversation for Gemini
+    const contents = [
+      {
+        role: 'user',
+        parts: [{ text: `You are EduAI, a friendly and helpful AI tutor for university students. Explain academic concepts clearly and simply. Focus on: Computer Science, AI, NLP, Python, Algorithms, Data Structures, Web Development, Databases. Keep answers under 200 words. Use bullet points for lists. Use triple backticks for code examples. Always be encouraging and supportive.` }]
+      },
+      {
+        role: 'model',
+        parts: [{ text: 'Hello! I am EduAI, ready to help you with any CS or education topic!' }]
+      },
+      // include previous chat messages
+      ...chatHistory,
+      // current user message
+      { role: 'user', parts: [{ text: val }] }
+    ];
+
+    const response = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY
+      },
+      body: JSON.stringify({ contents })
+    });
+
+    const data = await response.json();
+
+    console.log('Gemini status:', response.status);
+    console.log('Gemini response:', data);
+
+    removeTyping(tid);
+
+    // ✅ FIX 3: Show actual Gemini API error if request fails
+    if (!response.ok) {
+      const errorMessage = data?.error?.message || 'Gemini API request failed. Please check your API key, model name, or API access.';
+      appendMsg('❌ Gemini API Error: ' + esc(errorMessage), 'ai', true);
+      return;
+    }
+
+    // ✅ FIX 4: Correct way to read Gemini response
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (reply) {
+      // save to history for multi-turn conversation
+      chatHistory.push({ role: 'user',  parts: [{ text: val   }] });
+      chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+
+      // keep history short — only last 16 messages
+      if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+
+      appendMsg(formatText(reply), 'ai', true);
+    } else {
+      appendMsg('Sorry, Gemini did not return a proper response. Please try again! 🙏', 'ai', true);
+    }
+
+  } catch (error) {
+    removeTyping(tid);
+    console.error('Gemini error:', error);
+    appendMsg('❌ Connection error. Please check your internet and try again.', 'ai', true);
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ✅ FIX 4: sendSug function was missing — added back
+function sendSug(q) {
+  document.getElementById('chat-input').value = q;
+  sendChat();
+}
+
+// ✅ FIX 5: Format Gemini markdown properly for display
+function formatText(t) {
+  return t
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, (_, c) => `<pre>${escH(c.trim())}</pre>`)
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/\*(.*?)\*/g, '<i>$1</i>')
+    .replace(/^#{1,3} (.+)$/gm, '<b>$1</b>')
+    .replace(/^[-•*] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+function appendMsg(text, who, isHTML=false) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  const av = who === 'ai' ? '🤖' : '👤';
+  div.innerHTML = `<div class="msg-av ${who}">${av}</div><div class="bubble ${who}">${isHTML ? text : esc(text)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const id = 'ty' + Date.now();
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg'; div.id = id;
+  div.innerHTML = `<div class="msg-av ai">🤖</div><div class="typing-b"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return id;
+}
+function removeTyping(id) { document.getElementById(id)?.remove(); }
+function esc(t)  { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escH(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// =====================================================
+//  QUIZ
+// =====================================================
+function pickTopic(el, topic) {
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  qz.topic = topic;
+  const btn = document.getElementById('start-btn');
+  btn.disabled = false;
+  btn.textContent = 'Start ' + topic + ' Quiz →';
+}
+function pickDiff(el, diff) {
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  qz.difficulty = diff;
+}
+function startQuiz() {
+  if (!qz.topic) return;
+  let pool = (QUESTIONS[qz.topic] || []).filter(q => q.diff === qz.difficulty);
+  if (!pool.length) pool = QUESTIONS[qz.topic] || [];
+  pool = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
+  qz.questions = pool; qz.idx = 0; qz.score = 0; qz.answered = false; qz.breakdown = [];
+  document.getElementById('quiz-setup').style.display = 'none';
+  document.getElementById('quiz-active').style.display = 'block';
+  renderQ();
+}
+function renderQ() {
+  const {questions, idx, score} = qz;
+  const q = questions[idx];
+  const pct = (idx / questions.length * 100).toFixed(0);
+  const dc = {easy:'badge-easy', medium:'badge-medium', hard:'badge-hard'}[q.diff] || 'badge-easy';
+  let html = `<div class="q-prog-row"><span class="q-prog-txt">Question ${idx+1} of ${questions.length}</span><span class="q-prog-txt" style="color:var(--blue)">${qz.topic}</span></div>
+<div class="q-prog-bar"><div class="q-prog-fill" style="width:${pct}%"></div></div>
+<div class="q-card"><span class="q-badge ${dc}">${q.diff.charAt(0).toUpperCase()+q.diff.slice(1)}</span>`;
+  if (q.code) html += `<pre class="q-code">${esc(q.code)}</pre>`;
+  html += `<div class="q-text">${q.q}</div><div class="options">`;
+  q.opts.forEach((o, i) => html += `<button class="opt-btn" id="opt${i}" onclick="pickOpt(${i})"><div class="opt-letter">${String.fromCharCode(65+i)}</div><span>${esc(o)}</span></button>`);
+  html += `</div><div class="exp-msg" id="exp-msg"></div><div class="q-footer"><span class="score-mini">Score: ${score}/${idx}</span><button class="next-q-btn" id="nqb" onclick="nextQ()">${idx < questions.length-1 ? 'Next question →' : 'See results →'}</button></div></div>`;
+  document.getElementById('quiz-active').innerHTML = html;
+}
+function pickOpt(i) {
+  if (qz.answered) return;
+  qz.answered = true;
+  const q = qz.questions[qz.idx];
+  const correct = i === q.ans;
+  if (correct) qz.score++;
+  qz.breakdown.push({q:q.q, correct, yours:q.opts[i], right:q.opts[q.ans]});
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('locked'));
+  document.getElementById('opt'+i).classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) document.getElementById('opt'+q.ans).classList.add('correct');
+  const e = document.getElementById('exp-msg');
+  e.textContent = '💡 ' + q.exp;
+  e.classList.add('show');
+  document.getElementById('nqb').style.display = 'block';
+  document.querySelector('.score-mini').textContent = `Score: ${qz.score}/${qz.idx+1}`;
+}
+function nextQ() { qz.idx++; qz.answered = false; qz.idx >= qz.questions.length ? showResult() : renderQ(); }
+function showResult() {
+  const {score, questions, topic, difficulty, breakdown} = qz;
+  const pct = Math.round(score / questions.length * 100);
+  const xp = pct >= 80 ? 100 : pct >= 60 ? 60 : 30;
+  const grade = pct>=90?'🏆 Excellent!':pct>=70?'🌟 Good job!':pct>=50?'📖 Keep studying!':'💪 More practice!';
+  state.xp += xp;
+  state.history.unshift({topic, difficulty, score, total:questions.length, pct, date:new Date().toLocaleDateString()});
+  document.getElementById('xp-count').textContent = state.xp;
+  const bd = breakdown.map(b => `<div class="bd-item"><div class="bd-icon" style="background:${b.correct?'#d1fae5':'#fee2e2'};color:${b.correct?'#065f46':'#7f1d1d'}">${b.correct?'✓':'✗'}</div><div><div style="font-weight:600;margin-bottom:2px">${esc(b.q.length>60?b.q.slice(0,60)+'...':b.q)}</div>${!b.correct?`<div style="font-size:12px;color:var(--text2)">You: <span style="color:var(--red)">${esc(b.yours)}</span> · Correct: <span style="color:var(--green)">${esc(b.right)}</span></div>`:''}</div></div>`).join('');
+  document.getElementById('quiz-active').innerHTML = `<div class="result-card"><div class="score-ring"><div class="score-pct">${pct}%</div><div class="score-frac">${score}/${questions.length}</div></div><div class="result-title">${grade}</div><div class="result-sub">${topic} · ${difficulty} · +${xp} XP earned</div><div class="result-btns"><button class="btn btn-blue" onclick="retryQuiz()">Try Again</button><button class="btn btn-outline" onclick="resetQuiz()">New Topic</button><button class="btn btn-outline" onclick="showPage('scores',null)">View Scores</button></div><div class="bd-title">Question Review</div>${bd}</div>`;
+  updateHome();
+}
+function retryQuiz() {
+  qz.idx=0; qz.score=0; qz.answered=false; qz.breakdown=[];
+  qz.questions=[...qz.questions].sort(()=>Math.random()-0.5);
+  renderQ();
+}
+function resetQuiz() {
+  document.getElementById('quiz-setup').style.display = 'block';
+  document.getElementById('quiz-active').style.display = 'none';
+  qz.topic = null;
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('sel'));
+  const btn = document.getElementById('start-btn');
+  btn.disabled = true; btn.textContent = 'Select a topic to start →';
+}
+
+// =====================================================
+//  SCORES
+// =====================================================
+function renderScores() {
+  const h = state.history;
+  const avg = h.length ? Math.round(h.reduce((a,b)=>a+b.pct,0)/h.length) : null;
+  const best = h.length ? Math.max(...h.map(x=>x.pct)) : null;
+  document.getElementById('sc-total').textContent = h.length;
+  document.getElementById('sc-avg').textContent = avg !== null ? avg+'%' : '—';
+  document.getElementById('sc-best').textContent = best !== null ? best+'%' : '—';
+  const rows = document.getElementById('history-rows');
+  if (!h.length) {
+    rows.innerHTML = `<div class="empty-msg">No quizzes yet! <button class="btn btn-blue" style="padding:6px 14px;font-size:13px;margin-left:8px" onclick="showPage('quiz',null)">Take a Quiz</button></div>`;
+    return;
+  }
+  const dl = { easy:'Easy', medium:'Medium', hard:'Hard' };
+  rows.innerHTML = h.map(x => {
+    const c = x.pct>=80?'var(--green)':x.pct>=60?'var(--orange)':'var(--red)';
+    return `<div class="hl-row"><span class="hl-topic">${x.topic}</span><span style="font-size:12px;color:var(--text2)">${dl[x.difficulty]||x.difficulty}</span><span class="hl-score-val" style="color:${c}">${x.score}/${x.total}</span><span><span class="${x.pct>=60?'badge-pass':'badge-fail'}">${x.pct>=60?'Pass':'Fail'}</span></span></div>`;
+  }).join('');
+}
+function updateHome() {
+  const h = state.history;
+  const avg = h.length ? Math.round(h.reduce((a,b)=>a+b.pct,0)/h.length) : null;
+  document.getElementById('home-quizzes').textContent = h.length;
+  document.getElementById('home-avg').textContent = avg !== null ? avg+'%' : '—';
+  document.getElementById('home-xp').textContent = state.xp;
+  document.getElementById('xp-count').textContent = state.xp;
+}
+</script>
+</body>
+</html>
